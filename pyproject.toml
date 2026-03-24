@@ -41,6 +41,7 @@ dev = [
     'pytest==9.0.2',
     'types-lxml==2026.2.16',
     'typing-extensions==4.15.0',
+    'requests',
 ]
 
 # https://setuptools.pypa.io/en/latest/userguide/entry_point.html#entry-points-for-plugins
