@@ -1,0 +1,41 @@
+name: Update UTR
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Every Monday at 09:00 UTC
+  workflow_dispatch:
+
+jobs:
+  update-utr:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - uses: actions/setup-python@v6.2.0
+        with:
+          python-version: '3.14'
+
+      - name: Install dependencies
+        run: pip install requests lxml
+
+      - name: Fetch UTR
+        id: fetch
+        run: python tools/fetch-utr.py
+
+      - name: Open PR if UTR changed
+        if: steps.fetch.outputs.network_error != 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "chore: update UTR data"
+          branch: automation/update-utr
+          title: "chore: update UTR data from xbrl.org"
+          body: |
+            The [XBRL Unit Type Registry](https://www.xbrl.org/utr/utr.xml) has been updated.
+
+            This PR was opened automatically by the weekly UTR check workflow.
+          labels: dependencies
+          delete-branch: true
